@@ -75,6 +75,7 @@ process(clk, reset)
 	
 	if(state_type'event) then
 		count_reg <= count_next;
+		count <= 0;
 	else
 		count<= count + 1;
 	end if;	
