@@ -48,50 +48,42 @@ architecture Behavioral of h_sync_gen is
 		
 begin
 
-	process(clk, reset)
-	begin
-	if((clk'event) and (clk='1') and (count > count_reg)) then
-		state_reg <= state_next;
-	else 
-		state_reg <= state_reg;
-	end if;
+	process(clk, reset, state_reg)
+		begin
 	
-
-		case state_reg is
-			when active_video=>
-				state_next <= front_porch;
-			when front_porch=>
-				state_next <= sync_pulse;
-			when sync_pulse=>
-				state_next <= back_porch;
-			when back_porch=>
-				state_next <= active_video;
-				
-		end case;
-	end process;
-
-process(clk, reset)
-	begin
+			if(reset = '1') then
+				state_reg <= active_video;
+			elsif (clk'event and clk = '1')
+				state_reg <= state_next;
+			end if;	
 	
-	if(state_type'event) then
-		count_reg <= count_next;
-		count <= 0;
-	else
-		count<= count + 1;
-	end if;	
-
-		case count_reg is
-			when 640=>				
-				count_next <= 16;
-			when 16=>
-				count_next <= 96;
-			when 96=>				 
-				count_next <= 48;
-			when 48=>
-				count_next <= 640;
+			case state_reg is
+				when active_video=>
+					state_next <= front_porch;
+				when front_porch=>
+					state_next <= sync_pulse;
+				when sync_pulse=>
+					state_next <= back_porch;
+				when back_porch=>
+					state_next <= active_video;
 				
-		end case;
+			end case;
+
 	end process;	
+	
+	process(clk, reset, count_reg)
+		begin
+		
+			if (reset = '1') then
+				count_reg <= '0';
+			elsif (clk'event and clk = '1')
+				count_reg <= count_next;
+			end if;
+		
+			count_next <= (others => '0') when (state_reg /= state_next) else
+								count_reg + 1;
+		
+	end process;		
 	
 completed <= '1' when(count_reg = 47 and state_reg = back_porch) else
 				 '0'; 	
