@@ -61,8 +61,12 @@ begin
 				when active_video=>
 					if(count_reg = "01010000000") then
 						state_next <= front_porch;
+						blank <= '1';
+						column <= "00000000000";
 					else
+						column <= count_reg;
 						completed <= '0';
+						blank <= '0';
 						state_next <= active_video;
 					end if;	
 				when front_porch=>
@@ -74,8 +78,10 @@ begin
 				when sync_pulse=>
 					if(count_reg = "00001100000") then
 						state_next <= back_porch;
+						h_sync <= '0';
 					else
 						state_next <= sync_pulse;
+						h_sync <= '1';
 					end if;	
 				when back_porch=>
 					if(count_reg = "00000101111") then
@@ -98,7 +104,7 @@ begin
 		begin
 		
 			if (reset = '1') then
-				count_reg <= '0';
+				count_reg <= "00000000000";
 			elsif (clk'event and clk = '1') then
 				count_reg <= count_next;
 			end if;
