@@ -35,7 +35,7 @@ entity h_sync_gen is
            h_sync    : out std_logic;
            blank     : out std_logic;
            completed : out std_logic;
-           column    : out unsigned(10 downto 0)
+           column_h    : out unsigned(10 downto 0)
      );
 end h_sync_gen;
 
@@ -62,9 +62,9 @@ begin
 					if(count_reg = "01010000000") then
 						state_next <= front_porch;
 						blank <= '1';
-						column <= "00000000000";
+						column_h <= "00000000000";
 					else
-						column <= count_reg;
+						column_h <= count_reg;
 						completed <= '0';
 						blank <= '0';
 						state_next <= active_video;

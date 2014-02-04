@@ -41,8 +41,8 @@ architecture Taormina of atlys_lab_video is
 
 COMPONENT pixel_gen
 	PORT(
-		row : IN std_logic_vector(10 downto 0);
-		column : IN std_logic_vector(10 downto 0);
+		row : IN unsigned(10 downto 0);
+		column : IN unsigned(10 downto 0);
 		blank : IN std_logic;          
 		r : OUT std_logic_vector(7 downto 0);
 		g : OUT std_logic_vector(7 downto 0);
@@ -58,13 +58,15 @@ COMPONENT pixel_gen
 		v_sync : OUT std_logic;
 		v_completed : OUT std_logic;
 		blank : OUT std_logic;
-		row : OUT std_logic_vector(10 downto 0);
-		column : OUT std_logic_vector(10 downto 0)
+		row : OUT unsigned(10 downto 0);
+		column : OUT unsigned(10 downto 0)
 		);
 	END COMPONENT;
 	
-	signal row_connector, column_connector : std_logic;
+	signal row_connector, column_connector : unsigned(10 downto 0);
 	
+	signal red, green, blue : std_logic_vector(7 downto 0);
+	signal pixel_clk, serialize_clk, serialize_clk_n, h_sync, v_sync, v_completed, blank, red_s, green_s, blue_s, clock_s:std_logic;
 begin
 
     -- Clock divider - creates pixel clock from 100MHz clock
@@ -111,9 +113,9 @@ begin
 		row => row_connector,
 		column => column_connector,
 		blank => blank,
-		r => r,
-		g => g,
-		b => b
+		r => red,
+		g => green,
+		b => blue
 	);
 
 

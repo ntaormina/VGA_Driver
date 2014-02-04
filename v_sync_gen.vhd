@@ -37,7 +37,7 @@ entity v_sync_gen is
            v_sync      : out std_logic;
            blank       : out std_logic;
            completed   : out std_logic;
-           row         : out unsigned(10 downto 0)
+           row_v         : out unsigned(10 downto 0)
      );
 end v_sync_gen;
 
@@ -63,9 +63,9 @@ begin
 					if(count_reg = "00111100000") then
 						state_next <= front_porch;
 						blank <= '1';
-						row <= "00000000000";
+						row_v <= "00000000000";
 					else
-						row <= count_reg;
+						row_v <= count_reg;
 						completed <= '0';
 						blank <= '0';
 						state_next <= active_video;
