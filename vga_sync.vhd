@@ -43,8 +43,58 @@ end vga_sync;
 
 architecture Behavioral of vga_sync is
 
+
+
+COMPONENT h_sync_gen
+	PORT(
+		clk : IN std_logic;
+		reset : IN std_logic;          
+		h_sync : OUT std_logic;
+		blank : OUT std_logic;
+		completed : OUT std_logic;
+		column : OUT std_logic_vector(10 downto 0)
+		);
+	END COMPONENT;
+
+COMPONENT v_sync_gen
+	PORT(
+		clk : IN std_logic;
+		reset : IN std_logic;
+		h_blank : IN std_logic;
+		h_completed : IN std_logic;          
+		v_sync : OUT std_logic;
+		blank : OUT std_logic;
+		completed : OUT std_logic;
+		row : OUT std_logic_vector(10 downto 0)
+		);
+	END COMPONENT;
+
+	signal horiz_blank, vert_blanc, completed_connector : std_logic; 
+	
 begin
 
+	
+Inst_h_sync_gen: h_sync_gen PORT MAP(
+		clk => clk,
+		reset => reset,
+		h_sync => h_sync,
+		blank => horiz_blank,
+		completed => completed_connector,
+		column => column
+	);		
+	
+	Inst_v_sync_gen: v_sync_gen PORT MAP(
+		clk => clk,
+		reset => reset,
+		h_blank => horiz_blank,
+		h_completed => completed_connector,
+		v_sync => v_sync,
+		blank => vert_blank,
+		completed => v_completed,
+		row => row
+	);
+	
+	blank <=(vert_blank or horiz_blank);
 
 end Behavioral;
 
