@@ -42,7 +42,7 @@ end h_sync_gen;
 
 architecture Behavioral of h_sync_gen is
 
-	type state_type is (active_video, front_porch, sync_pulse, back_porch, completed);
+	type state_type is (active_video, front_porch, sync_pulse, back_porch, completed_state);
 	signal count_reg, count_next, count: unsigned(10 downto 0);
 	signal state_reg, state_next: state_type;
 		
@@ -85,22 +85,22 @@ begin
 					end if;	
 				when back_porch=>
 					if(count_reg = "00000101111") then
-						state_next <= completed;
+						state_next <= completed_state;
 					else
 						state_next <= back_porch;
 					end if;	
-				when completed=>
+				when completed_state=>
 					if(count_reg = "00000000001") then
 						completed <= '1';
 						state_next <= active_video;
 					else
-						state_next <= completed;		
+						state_next <= completed_state;		
 					end if;
 			end case;
 
 	end process;	
 	
-	process(clk, reset, count_reg)
+	process(clk, reset, count_reg, state_reg)
 		begin
 		
 			if (reset = '1') then
@@ -108,11 +108,17 @@ begin
 			elsif (clk'event and clk = '1') then
 				count_reg <= count_next;
 			end if;
+		end process;
 		
-			count_next <= (others => '0') when (state_reg /= state_next) else
-								count_reg + "00000000001";
+	process(clk, reset, count_reg, state_reg)
+		begin
+			if(state_reg = state_next) then
+				count_next <= count_reg + "00000000001" ;
+			elsif (state_reg /= state_next) then
+				count_next <=  "00000000000";
+			end if;	
+		end process;
 		
-	end process;		
 	
  	
 

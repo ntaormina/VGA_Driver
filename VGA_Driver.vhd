@@ -31,14 +31,39 @@ entity atlys_lab_video is
              tmds  : out std_logic_vector(3 downto 0);
              tmdsb : out std_logic_vector(3 downto 0)
          );
+			
+		
 end atlys_lab_video;
 
 
+
 architecture Taormina of atlys_lab_video is
+
+COMPONENT pixel_gen
+	PORT(
+		row : IN std_logic_vector(10 downto 0);
+		column : IN std_logic_vector(10 downto 0);
+		blank : IN std_logic;          
+		r : OUT std_logic_vector(7 downto 0);
+		g : OUT std_logic_vector(7 downto 0);
+		b : OUT std_logic_vector(7 downto 0)
+		);
+	END COMPONENT;
 	
-	type state_type is (active_video, front_porch, sync_pulse, back_porch, assert_completed);
-	signal count_reg, count_next: integer;
-	signal state_reg, state_next: state_type;
+	COMPONENT vga_sync
+	PORT(
+		clk : IN std_logic;
+		reset : IN std_logic;          
+		h_sync : OUT std_logic;
+		v_sync : OUT std_logic;
+		v_completed : OUT std_logic;
+		blank : OUT std_logic;
+		row : OUT std_logic_vector(10 downto 0);
+		column : OUT std_logic_vector(10 downto 0)
+		);
+	END COMPONENT;
+	
+	signal row_connector, column_connector : std_logic;
 	
 begin
 
@@ -70,7 +95,27 @@ begin
             );
 
     -- TODO: VGA component instantiation
+	 Inst_vga_sync: vga_sync PORT MAP(
+		clk => clk,
+		reset => reset,
+		h_sync => h_sync,
+		v_sync => v_sync,
+		v_completed => v_completed,
+		blank => blank,
+		row => row_connector,
+		column => column_connector
+	);
+	 
     -- TODO: Pixel generator component instantiation
+	 Inst_pixel_gen: pixel_gen PORT MAP(
+		row => row_connector,
+		column => column_connector,
+		blank => blank,
+		r => r,
+		g => g,
+		b => b
+	);
+
 
     -- Convert VGA signals to HDMI (actually, DVID ... but close enough)
     inst_dvid: entity work.dvid

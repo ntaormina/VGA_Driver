@@ -43,7 +43,7 @@ end v_sync_gen;
 
 architecture Behavioral of v_sync_gen is
 
-type state_type is (active_video, front_porch, sync_pulse, back_porch, completed);
+type state_type is (active_video, front_porch, sync_pulse, back_porch, completed_state);
 	signal count_reg, count_next, count: unsigned(10 downto 0);
 	signal state_reg, state_next: state_type;
 		
@@ -86,16 +86,16 @@ begin
 					end if;	
 				when back_porch=>
 					if(count_reg = "00000100000") then
-						state_next <= completed;
+						state_next <= completed_state;
 					else
 						state_next <= back_porch;
 					end if;	
-				when completed=>
+				when completed_state=>
 					if(count_reg = "00000000001") then
 						completed <= '1';
 						state_next <= active_video;
 					else
-						state_next <= completed;		
+						state_next <= completed_state;		
 					end if;
 			end case;
 
@@ -111,9 +111,17 @@ begin
 				count_reg <= count_next;
 			end if;	
 			
-			count_next <= (others => '0') when (state_reg /= state_next) else
-								count_reg + "00000000001" when (h_completed = '1' and clk = '1') else
-								count_reg;
+			--count_next <= (others => '0') when (state_reg /= state_next) else
+			--					count_reg + "00000000001" when (h_completed = '1' and clk = '1') else
+			--					count_reg;
+								
+			if(state_reg /= state_next) then
+				count_next <= (others => '0');
+			elsif(h_completed = '1' and clk = '1') then
+				count_next <= count_reg + "00000000001";
+			else
+				count_next <= count_reg;
+			end if;	
 
 			
 	end process;
