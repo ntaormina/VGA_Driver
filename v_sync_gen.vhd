@@ -32,6 +32,7 @@ use UNISIM.VComponents.all;
 entity v_sync_gen is
     port ( clk         : in  std_logic;
            reset       : in std_logic;
+			  h_blank     : in std_logic;
            h_completed : in std_logic;
            v_sync      : out std_logic;
            blank       : out std_logic;
@@ -58,48 +59,33 @@ begin
 			end if;	
 		end process;
 		
-	process(count_reg, state_reg, state_next, count_next, h_completed)
+	process(count_reg, state_reg)
 		begin
-			v_sync <= '1';
-			blank <= '1';
-			completed <= '0';
-			row <= "00000000000";
+			
 			
 			state_next <= state_reg;
 			
 			if(h_completed = '1') then
 	
-			case state_reg is
-				when active_video=>
-					if(count_reg = 480 ) then
-						state_next <= front_porch;
-					else
-						row <= count_next;					
-						blank <= '0';
-						state_next <= active_video;
-					end if;	
-				when front_porch=>
-					if(count_reg = 8) then
-						state_next <= sync_pulse;
-					else 
-						state_next <= front_porch;	
-					end if;	
-				when sync_pulse=>
-					if(count_reg = 2) then
-						state_next <= back_porch;						
-					else
-						state_next <= sync_pulse;
-						v_sync <= '0';
-					end if;	
-				when back_porch=>
-					if(count_reg = 30) then
-						state_next <= completed_state;
-					else
-						state_next <= back_porch;
-					end if;	
-				when completed_state=>
-						completed <= '1';
-						state_next <= active_video;
+				case state_reg is
+					when active_video=>
+						if(count_reg = 480 ) then
+							state_next <= front_porch;
+						end if;	
+					when front_porch=>
+						if(count_reg = 8) then
+							state_next <= sync_pulse;							
+						end if;	
+					when sync_pulse=>
+						if(count_reg = 2) then
+							state_next <= back_porch;						
+						end if;	
+					when back_porch=>
+						if(count_reg = 30) then
+							state_next <= completed_state;
+						end if;	
+					when completed_state=>
+							state_next <= active_video;
 												
 			end case;
 		end if;
@@ -110,23 +96,58 @@ begin
 		begin
 		
 			if(reset = '1') then
-				count_reg <= "00000000000";
+				count_reg <= (others => '0');
 			elsif(rising_edge(clk)) then
 				count_reg <= count_next;
 			end if;	
 			
 		end process;
 			
-	process(clk, reset, count_reg, state_reg)		
+	process(count_reg, state_reg)		
 		begin
 			if(state_reg /= state_next) then
 				count_next <= (others => '0');
 			elsif(h_completed = '0') then
 				count_next <= count_reg;
 			else
-				count_next <= count_reg + "00000000001";
+				count_next <= count_reg + 1;
 			end if;
 			
+	end process;
+	
+	process(state_next, count_next, h_completed)
+		begin
+			v_sync <= '1';
+			blank <= '1';
+			completed <= '0';
+			row <= (others => '0');
+			
+			
+			
+			
+			case state_reg is
+				when active_video=>					
+					
+					row <= count_next;					
+					blank <= '0';
+						
+						
+				when front_porch=>
+					
+				when sync_pulse=>
+					
+					v_sync <= '0';
+					
+				when back_porch=>
+					
+					
+				when completed_state=>
+				
+					completed <= '1';
+						
+												
+			end case;
+		
 	end process;
 	
 

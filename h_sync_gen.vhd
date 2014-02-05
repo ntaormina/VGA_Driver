@@ -42,16 +42,14 @@ end h_sync_gen;
 
 architecture Behavioral of h_sync_gen is
 
-	type v_sync_type is (active_video, front_porch, sync_pulse, back_porch, completed_state);
+	type h_sync_type is (active_video, front_porch, sync_pulse, back_porch, completed_state);
 	signal count_reg, count_next: unsigned(10 downto 0);
-	signal state_reg, state_next: v_sync_type;
+	signal state_reg, state_next: h_sync_type;
 		
 begin
 
 	process(clk, reset)
-		begin
-		
-		
+		begin		
 	
 			if(reset = '1') then
 				state_reg <= active_video;
@@ -61,24 +59,16 @@ begin
 			
 		end process;	
 		
-	process(count_reg, state_reg, state_next, count_next)
+	process(count_reg, state_reg)
 	begin
-	
-		h_sync <= '1';
-		blank <= '1';
-		completed <= '0';
-		column <= "00000000000";
+		
 	
 	state_next <= state_reg;
 	
 			case state_reg is
 				when active_video=>
 					if(count_reg = 640) then 
-						state_next <= front_porch;												
-					else			
-						column <= count_next;
-						blank <= '0';
-						
+						state_next <= front_porch;				
 					end if;	
 				when front_porch=>
 					if(count_reg = 14) then
@@ -86,22 +76,16 @@ begin
 					end if;	
 				when sync_pulse=>
 					if(count_reg = 96) then
-						state_next <= back_porch;						
-					else						
-						h_sync <= '0';
+						state_next <= back_porch;					
 					end if;	
 				when back_porch=>
 					if(count_reg = 45) then
 						state_next <= completed_state;					
 					end if;	
-				when completed_state=>
-						completed <= '1';
+				when completed_state=>						
 						state_next <= active_video;
 					
 			end case;
-			
-			
-
 	end process;	
 	
 					
@@ -109,13 +93,13 @@ begin
 		begin
 		
 			if (reset = '1') then
-				count_reg <= "00000000000";
+				count_reg <= (others => '0');
 			elsif (rising_edge(clk)) then
 				count_reg <= count_next;
 			end if;
 		end process;
 		
-	process(count_reg, state_reg, clk, reset)
+	process(count_reg, state_reg)
 		begin
 			if(state_reg /= state_next) then
 				count_next <=  "00000000000";				
@@ -124,6 +108,45 @@ begin
 				
 			end if;	
 		end process;
+		
+	process(state_next, count_next)
+		begin
+	
+		h_sync <= '1';
+		blank <= '1';
+		completed <= '0';
+		column <= (others =>'0');
+	
+	
+	
+			case state_next is
+				when active_video=>
+				
+					column <= count_next;
+					blank <= '0';
+					
+				when front_porch=>
+					
+											
+					
+				when sync_pulse=>
+					
+					h_sync <= '0';
+						
+				when back_porch=>
+					
+											
+						
+				when completed_state=>
+				
+					completed <= '1';
+						
+					
+			end case;
+			
+			
+
+	end process;	
 		
 	
  	

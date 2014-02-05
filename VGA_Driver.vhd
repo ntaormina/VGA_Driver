@@ -102,7 +102,7 @@ begin
 		reset => reset,
 		h_sync => h_sync_sig,
 		v_sync => v_sync_sig,
-		v_completed => v_completed,
+		v_completed => open,
 		blank => blank_sig,
 		row => row_connector,
 		column => column_connector

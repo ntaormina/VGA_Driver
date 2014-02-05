@@ -46,12 +46,13 @@ begin
 process(column, row, blank)
 begin
 	if (blank = '0') then
-		if(row < "00100101100") then
-			if(column < "00011011100") then
+
+		if(row < 360) then
+			if(column < 220 )then
 				r <= "11111111";
 				g <= "00000000";
 				b <= "00000000";
-			elsif(column < "00011010010") then
+			elsif(column > 440) then
 				r <= "00000000";
 				g <= "11111111";
 				b <= "00000000";
@@ -61,14 +62,14 @@ begin
 				b <= "11111111";
 			end if;
 		else
-			r <= "00000000";
+			r <= "11111111";
 			g <= "11111111";
-			b <= "11111111";
+			b <= "00000000";
 		end if;
 	else	
-		r <= "00000000";
-		g <= "00000000";
-		b <= "00000000";
+		r <= (others=>'0');
+		g <= (others=>'0');
+		b <= (others=>'0');
 	end if;	
 end process;
 end Behavioral;
