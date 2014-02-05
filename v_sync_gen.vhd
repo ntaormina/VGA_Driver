@@ -79,7 +79,7 @@ begin
 						state_next <= active_video;
 					end if;	
 				when front_porch=>
-					if(count_reg = 10) then
+					if(count_reg = 8) then
 						state_next <= sync_pulse;
 					else 
 						state_next <= front_porch;	
@@ -92,7 +92,7 @@ begin
 						v_sync <= '0';
 					end if;	
 				when back_porch=>
-					if(count_reg = 32) then
+					if(count_reg = 30) then
 						state_next <= completed_state;
 					else
 						state_next <= back_porch;

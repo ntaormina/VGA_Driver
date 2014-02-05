@@ -78,26 +78,21 @@ begin
 					else			
 						column <= count_next;
 						blank <= '0';
-						state_next <= active_video;
+						
 					end if;	
 				when front_porch=>
-					if(count_reg = 16) then
-						state_next <= sync_pulse;
-					else 
-						state_next <= front_porch;	
+					if(count_reg = 14) then
+						state_next <= sync_pulse;						
 					end if;	
 				when sync_pulse=>
 					if(count_reg = 96) then
 						state_next <= back_porch;						
-					else
-						state_next <= sync_pulse;
+					else						
 						h_sync <= '0';
 					end if;	
 				when back_porch=>
-					if(count_reg = 47) then
-						state_next <= completed_state;
-					else
-						state_next <= back_porch;
+					if(count_reg = 45) then
+						state_next <= completed_state;					
 					end if;	
 				when completed_state=>
 						completed <= '1';
@@ -120,7 +115,7 @@ begin
 			end if;
 		end process;
 		
-	process(count_reg, state_reg)
+	process(count_reg, state_reg, clk, reset)
 		begin
 			if(state_reg /= state_next) then
 				count_next <=  "00000000000";				
