@@ -65,8 +65,8 @@ COMPONENT pixel_gen
 	
 	signal row_connector, column_connector : unsigned(10 downto 0);
 	
-	signal red, green, blue : std_logic_vector(7 downto 0);
-	signal pixel_clk, serialize_clk, serialize_clk_n, h_sync, v_sync, v_completed, blank, red_s, green_s, blue_s, clock_s:std_logic;
+	signal red_sig, green_sig, blue_sig : std_logic_vector(7 downto 0);
+	signal pixel_clk, serialize_clk, serialize_clk_n, h_sync_sig, v_sync_sig, v_completed, blank_sig, red_s, green_s, blue_s, clock_s:std_logic;
 begin
 
     -- Clock divider - creates pixel clock from 100MHz clock
@@ -98,12 +98,12 @@ begin
 
     -- TODO: VGA component instantiation
 	 Inst_vga_sync: vga_sync PORT MAP(
-		clk => clk,
+		clk => pixel_clk,
 		reset => reset,
-		h_sync => h_sync,
-		v_sync => v_sync,
+		h_sync => h_sync_sig,
+		v_sync => v_sync_sig,
 		v_completed => v_completed,
-		blank => blank,
+		blank => blank_sig,
 		row => row_connector,
 		column => column_connector
 	);
@@ -112,10 +112,10 @@ begin
 	 Inst_pixel_gen: pixel_gen PORT MAP(
 		row => row_connector,
 		column => column_connector,
-		blank => blank,
-		r => red,
-		g => green,
-		b => blue
+		blank => blank_sig,
+		r => red_sig,
+		g => green_sig,
+		b => blue_sig
 	);
 
 
@@ -125,12 +125,12 @@ begin
                 clk       => serialize_clk,
                 clk_n     => serialize_clk_n, 
                 clk_pixel => pixel_clk,
-                red_p     => red,
-                green_p   => green,
-                blue_p    => blue,
-                blank     => blank,
-                hsync     => h_sync,
-                vsync     => v_sync,
+                red_p     => red_sig,
+                green_p   => green_sig,
+                blue_p    => blue_sig,
+                blank     => blank_sig,
+                hsync     => h_sync_sig,
+                vsync     => v_sync_sig,
                 -- outputs to TMDS drivers
                 red_s     => red_s,
                 green_s   => green_s,

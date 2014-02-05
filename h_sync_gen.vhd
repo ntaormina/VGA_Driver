@@ -35,87 +35,98 @@ entity h_sync_gen is
            h_sync    : out std_logic;
            blank     : out std_logic;
            completed : out std_logic;
-           column_h    : out unsigned(10 downto 0)
+           column    : out unsigned(10 downto 0)
      );
 end h_sync_gen;
 
 
 architecture Behavioral of h_sync_gen is
 
-	type state_type is (active_video, front_porch, sync_pulse, back_porch, completed_state);
-	signal count_reg, count_next, count: unsigned(10 downto 0);
-	signal state_reg, state_next: state_type;
+	type v_sync_type is (active_video, front_porch, sync_pulse, back_porch, completed_state);
+	signal count_reg, count_next: unsigned(10 downto 0);
+	signal state_reg, state_next: v_sync_type;
 		
 begin
 
-	process(clk, reset, state_reg, count_reg)
+	process(clk, reset)
 		begin
+		
+		
 	
 			if(reset = '1') then
 				state_reg <= active_video;
-			elsif (clk'event and clk = '1') then
+			elsif (rising_edge(clk)) then
 				state_reg <= state_next;
 			end if;	
+			
+		end process;	
+		
+	process(count_reg, state_reg, state_next, count_next)
+	begin
+	
+		h_sync <= '1';
+		blank <= '1';
+		completed <= '0';
+		column <= "00000000000";
+	
+	state_next <= state_reg;
 	
 			case state_reg is
 				when active_video=>
-					if(count_reg = "01010000000") then
-						state_next <= front_porch;
-						blank <= '1';
-						column_h <= "00000000000";
-					else
-						column_h <= count_reg;
-						completed <= '0';
+					if(count_reg = 640) then 
+						state_next <= front_porch;												
+					else			
+						column <= count_next;
 						blank <= '0';
 						state_next <= active_video;
 					end if;	
 				when front_porch=>
-					if(count_reg = "00000010000") then
+					if(count_reg = 16) then
 						state_next <= sync_pulse;
 					else 
 						state_next <= front_porch;	
 					end if;	
 				when sync_pulse=>
-					if(count_reg = "00001100000") then
-						state_next <= back_porch;
-						h_sync <= '0';
+					if(count_reg = 96) then
+						state_next <= back_porch;						
 					else
 						state_next <= sync_pulse;
-						h_sync <= '1';
+						h_sync <= '0';
 					end if;	
 				when back_porch=>
-					if(count_reg = "00000101111") then
+					if(count_reg = 47) then
 						state_next <= completed_state;
 					else
 						state_next <= back_porch;
 					end if;	
 				when completed_state=>
-					if(count_reg = "00000000001") then
 						completed <= '1';
 						state_next <= active_video;
-					else
-						state_next <= completed_state;		
-					end if;
+					
 			end case;
+			
+			
 
 	end process;	
 	
-	process(clk, reset, count_reg, state_reg)
+					
+	process(clk, reset)
 		begin
 		
 			if (reset = '1') then
 				count_reg <= "00000000000";
-			elsif (clk'event and clk = '1') then
+			elsif (rising_edge(clk)) then
 				count_reg <= count_next;
 			end if;
 		end process;
 		
-	process(clk, reset, count_reg, state_reg)
+	process(count_reg, state_reg)
 		begin
-			if(state_reg = state_next) then
+			if(state_reg /= state_next) then
+				count_next <=  "00000000000";				
+			else
 				count_next <= count_reg + "00000000001" ;
-			elsif (state_reg /= state_next) then
-				count_next <=  "00000000000";
+				
 			end if;	
 		end process;
 		
