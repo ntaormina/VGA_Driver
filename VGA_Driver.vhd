@@ -28,6 +28,8 @@ entity atlys_lab_video is
     port ( 
              clk   : in  std_logic; -- 100 MHz
              reset : in  std_logic;
+				 SW0   : in std_logic;
+				 SW1   : in std_logic;
              tmds  : out std_logic_vector(3 downto 0);
              tmdsb : out std_logic_vector(3 downto 0)
          );
@@ -44,6 +46,8 @@ COMPONENT pixel_gen
 		row : IN unsigned(10 downto 0);
 		column : IN unsigned(10 downto 0);
 		blank : IN std_logic;          
+		switch0 : IN std_logic;
+		switch1 : IN std_logic;
 		r : OUT std_logic_vector(7 downto 0);
 		g : OUT std_logic_vector(7 downto 0);
 		b : OUT std_logic_vector(7 downto 0)
@@ -113,6 +117,8 @@ begin
 		row => row_connector,
 		column => column_connector,
 		blank => blank_sig,
+		switch0 => SW0,
+		switch1 => SW1,
 		r => red_sig,
 		g => green_sig,
 		b => blue_sig
