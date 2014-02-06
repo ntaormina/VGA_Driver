@@ -138,6 +138,10 @@ immediately.
 - I ran into many small syntactical problems that I really solved with brute force. I looked up things in the book
 or on the internet or just read the console and tried things.
 
+-Here's an example of testing my `h_sync_gen.vhd`
+
+![h_sync_test](h_sync.jpg)
+
 Conclusion
 ==========
 From this lab I definitely took away how precise VGA synchronization has to be. It made me appreciate
