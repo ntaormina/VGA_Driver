@@ -3,11 +3,58 @@ VGA_Driver
 
 Introduction
 ============
-The object of this lab was to write vhdl code to synchronize an FPGA with a VGA display.
+The object of this lab was to write VHDL code to synchronize an FPGA with a VGA display.
 
 Implementation
 ==============
 
+State machine
+
+active_video
+if(count > 640){
+front_porch
+}else{
+active_video
+}
+
+front_porch
+if(count > 16){
+sync_pulse
+}else{
+front_porch
+}
+
+sync_pulse
+if(count > 96){
+back_porch
+}else{
+sync_pulse
+}
+
+back_porch
+if(count > 47){
+completed_state
+}else{
+back_porch
+}
+
+completed_state
+to active_video
+
+VGA_Driver.vhd
+-This is the main top level implementation where vga_sync, dvid, and pixel_gen are instantiated. They are all interconnected with signals created here.
+
+vga_sync.vhd
+-This is where v_sync and h_sync are connected to each other. Their main connection is the completed signal. The only output is when either vertical or horizontal are blank.
+
+h_sync_gen.vhd
+-This generates the horizontal row of synchronization signals. It switches between 5 states: active_video, front_porch, sync_pulse, back_porch, completed. It sets blank low when in active video, h_sync low when in the sync_pulse, and completed high when in completed_state. It contains three flip-flops that govern next state logic, next count logic, and count reseting.
+
+v_sync_gen.vhd
+--This generates the vertical row of synchronization signals. It switches between 5 states: active_video, front_porch, sync_pulse, back_porch, completed. It sets blank low when in active video, h_sync low when in the sync_pulse, and completed high when in completed_state. It contains three flip-flops that govern next state logic, next count logic, and count reseting. It is very similar to h_sync but only operates while h_completed it high. h_sync and v_sync alternate.
+
+pixel_gen.vhd
+-This signal sets values to r, g and b to display certain colors on the display. The higher the number the brighter the color. There are four sets of different r,g,b values that correspond to different switch values for A functionality.
 
 Test/Debug
 ==========
