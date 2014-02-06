@@ -16,17 +16,17 @@ for h_sync_gen and v_sync_gen. They were simple test benches that allowed contin
 front_porch,sync_pulse, back_porch, and completed states. This allowed me to check the length of each of the states 
 and adjust their values in the code to make them perfect.
 
-	I ran into a problem with sensitivity lists. All of my code seemed to be correct and I wasn't leaving anything 
+I ran into a problem with sensitivity lists. All of my code seemed to be correct and I wasn't leaving anything 
 out but the screen would just flicker black. I figured it was something with h_sync and v_sync so I went through and cleaned 
 them up. By cleaned them up I mean that I separated my convoluted state machine logic into two separate processes and made sure 
 I had all correct flip-flops. I then added a lot of signals to the sensitivity lists of each process until
 there was a pattern displayed on the screen.
 
-	Another problem I ran into was in trying to get the A functionality. I thought that the code was perfect but the
+Another problem I ran into was in trying to get the A functionality. I thought that the code was perfect but the
 switched did not change anything. After some advice I added code to the user constraint file and that fixed the problem 
 immediately.
 
-	I ran into many small syntactical problems that I really solved with brute force. I looked up things in the book
+I ran into many small syntactical problems that I really solved with brute force. I looked up things in the book
 or on the internet or just read the console and tried things.
 
 Conclusion
