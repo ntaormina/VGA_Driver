@@ -8,6 +8,8 @@ The object of this lab was to write VHDL code to synchronize an FPGA with a VGA 
 Implementation
 ==============
 
+![state machine for h_sync_gen](state_machine.jpg)
+
 ```vhdl
 State machine h_sync
 
